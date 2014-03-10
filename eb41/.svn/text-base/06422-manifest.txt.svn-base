@@ -1,0 +1,66 @@
+File Manifest for ICPSR 6422
+
+Reif, Karlheinz, and Eric Marlier. EURO-BAROMETER 41.0: TRADE ISSUES, BLOOD
+DONATION, AIDS, AND SMOKING, MARCH-JUNE 1994 [Computer file]. Conducted by
+INRA (Europe), Brussels. 4th ICPSR ed. Ann Arbor, MI: Inter-university
+Consortium for Political and Social Research [producer], 1998. Cologne,
+Germany: Zentralarchiv fur Empirische Sozialforschung/Ann Arbor, MI: Inter-
+university Consortium for Political and Social Research [distributors],
+1998.
+
+Details on the version history can be found below the file listings.
+
+
+Study-level Documentation
+
+    Filename                            Record  Record    Case      Var.    File    Date
+                                        Length  Count     Count     Count   Struct. Updated
+
+    06422-related_literature.txt        -       -         -         -       -       2006-09-19
+
+    06422-manifest.txt                  -       -         -         -       -       2006-09-20
+
+
+DS0001 Euro-barometer 41.0:  Trade Issues, Blood Donation, AIDS, and
+Smoking, March-June 1994
+
+    Filename                            Record  Record    Case      Var.    File    Date
+                                        Length  Count     Count     Count   Struct. Updated
+
+    06422-0001-Codebook.txt             -       -         -         -       -       1998-03-06
+
+    06422-0001-Data.dta                 -       -         19,477    540     -       2005-03-10
+
+    06422-0001-Data.por                 -       -         19,477    540     -       2005-03-10
+
+    06422-0001-Data.txt                 752     19,477    19,477    540     rect.   1998-03-06
+
+    06422-0001-Data.xpt                 -       -         19,477    540     -       2005-03-10
+
+    06422-0001-Questionnaire.pdf        -       -         -         -       -       1998-02-25
+
+    06422-0001-Setup.do                 -       -         -         -       -       2005-03-10
+
+    06422-0001-Setup.sas                -       -         -         -       -       1998-03-06
+
+    06422-0001-Setup.sps                -       -         -         -       -       1998-03-06
+
+    06422-0001-Stata_dictionary.dct     -       -         -         -       -       2005-03-10
+
+    06422-0001-Supplemental_syntax.do   -       -         -         -       -       2005-03-10
+
+    06422-0001-Supplemental_syntax.sas  -       -         -         -       -       2005-03-10
+
+
+Version History
+
+2005-11-04  On 2005-03-14 new files were added to one or  more datasets.
+These files included additional setup files as well as one or more of the
+following: SAS  program, SAS transport, SPSS portable,  and Stata system
+files. The  metadata record was revised  2005-11-04 to  reflect these
+additions.  1998-02-26 The data have been revised and additional
+standardization of missing data codes was performed. The SPSS data
+definition statements were also revised. In addition, SAS data definition
+statements were added to the collection, as well as a full machine-readable
+codebook with bivariate frequencies, and the data collection instrument is
+now available as a PDF file.

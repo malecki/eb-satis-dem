@@ -1,0 +1,345 @@
+\documentclass[10pt]{article} %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% Modeling the sources of EU Institutional Satisfaction
+%%%   revealed by a survey question order experiment
+%%%
+%%% mjm / 2008-09-03 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% options to change font. If you want to play with MinionPro,
+%%% come bug me sometime. --mike
+%%% LOTS OF COOL FONT INFO AT http://www.tug.dk/FontCatalogue/
+%%% NO NEED EVER TO USE COMPUTER MODERN, AN ABOMINATION
+%\usepackage{times}
+%\usepackage{cmbright}
+%\renewcommand\sfdefault{phv}% use helvetica for sans serif
+%\renewcommand\familydefault{\sfdefault}% use sans serif by default
+\usepackage[opticals,textosf,mathlf,amsbb,minionint,footnotefigures]{MinionPro}
+
+\usepackage{longtable}
+\usepackage{rotating}
+%% Alter some LaTeX defaults for better treatment of figures:
+%% This is from the first result of google: "latex dumb defaults"
+    \renewcommand{\topfraction}{0.9}	
+    \renewcommand{\bottomfraction}{0.8}	
+    %   Parameters for TEXT pages (not float pages):
+    \setcounter{topnumber}{2}
+    \setcounter{bottomnumber}{2}
+    \setcounter{totalnumber}{4}     
+    \setcounter{dbltopnumber}{2}    
+    \renewcommand{\dbltopfraction}{0.9}	
+    \renewcommand{\textfraction}{0.07}	
+    %   Parameters for FLOAT pages (not text pages):
+    \renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
+	% N.B.: floatpagefraction MUST be less than topfraction !!
+    \renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
+
+%%% Enable the bibliography
+%%%     see  http://merkel.zoneo.net/Latex/natbib.php
+%%% 
+%%% round: use () for in-text cites (other options square, curly, angle)
+%%% sort: orders multiple citations into the sequence in which they 
+%%%       appear in the list of references;
+%%% sort&compress: as sort but in addition multiple numerical
+%%%                citations are compressed if possible (as 3-6, 15);
+%%% numbers: for numerica citations
+%%% super:   superscripted numbers as in Nature
+\usepackage[round]{natbib}
+%%% Want to change the section head of the bib??
+%\AtBeginDocument{\renewcommand\refname{LITERATURE CITED}}
+
+%%% Set up the margins: "right" and "bottom" are computed
+%%% by adding the things specified here, so
+%%%  .5in + 7.5in = 8in = .5 right margin
+\oddsidemargin=0in
+\textwidth=6.5in
+\topmargin=-.25in
+\headheight=0.0in
+\headsep=0.0in
+\textheight=8.7in
+
+%%% This is how you set  line spacing globally inside []
+%%% Options are "singlespacing","onehalfspacing","doublespacing"
+%%% To change WITHIN the document (you want a section single spaced)
+%%% just drop in, where needed, \singlespacing
+%%% and then \doublespacing again when finished.
+\usepackage[doublespacing]{setspace} 
+
+\usepackage{hyperref} % \href{http://link.com}{link text}
+\usepackage{graphicx} % for figures of all kinds
+
+%% Caption labels bold. Always left-align, do not center short ones.
+%% Use . instead of : after label. Size option.
+\usepackage[bf,nooneline,labelsep=period,footnotesize]{caption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{dcolumn}  % enable decimal align tables
+%\usepackage{wrapfig}  % wrappable figures
+
+%%% How to treat new paragraphs: units are anything that latex
+%%% understands: in, mm, pt, cm, [em, ex (typographic units!)]
+\setlength{\parindent}{1em} % 1em  indent first line
+\setlength{\parskip}{0.5ex} % half x-height space between para
+
+%%% Working Example of how you specify shortcut macros:
+\newcommand{\ybar}{\ensuremath{\overline{y}}}
+
+%%% Other options: Options>Soft wordwrap for easy viewing
+%%% Italics and Bold: ctrl+C,F,I (C-c, C-f, C-i) for inserting italicized text. 
+%%% CFB for bold.
+%%% rm sf tt md bf up it sl sc 
+%%% Drag citations from Bibdesk
+war%%% single - for intraword hyphen. Anything longer, use two -- or three ---
+
+%%% Figures. Wrapfigure at Right Left or Center.
+%%% Set bounding box size (same as figure size).
+%%% Insert your figure BEFORE the text. 
+%%% Subsequent text will wrap around the figure.
+
+%%% Normally, just use figure environment.
+%%% To insert a figure, drag the icon (without typing the command!) 
+%%% from the finder and it will insert.
+%%% Type width= or height= in the [options] before the {argument}.
+%%% Latex>Insert Envt>Figure (figure* means no number)
+%%% "Figure #." is handled by latex, not you. Just type.
+%%% To refer to a figure (or any \label) type \ref{thelabel}
+%%% in text or use Ref menu, "C-c )" emacs will do it for you.
+
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{Sweave}
+\begin{document}
+
+\thispagestyle{empty} % No page number first page
+
+%%%%%%%%%%%%%%% Useful Sweave arguments!  %%%%%%%%%%%%%%%%%
+%%% echo=FALSE fig=TRUE results=hide eps=FALSE include=FALSE
+%%% results=tex for tables
+%%% \setkeys{Gin}{width=,height=}
+
+<<mainsetup,echo=FALSE,results=hide>>=
+setwd("~/matt/apsa07/")
+library(xtable)
+library(apsrtable)
+library(lattice)
+library(survey)
+library(arm)
+load("inst-satis.Rdata")
+## Load surveys (only relevant items)
+## also contains a few support functions
+# source("readData.R")
+## fix the age thing
+
+
+cens <- read.fwf("/Users/malecki/Downloads/ipumsi_00003.dat",
+                 widths=c(4,3,1,1,3,3,2,2,3,1),
+                 col.names=c("sample","age","sex","edattan","edattand","educnl","educuk",
+                   "eedatta","eempsta","eclaswk")
+)  
+cens <- subset(cens,age>14)
+#cens <- cens[,c(1,5,7,16)]
+cens$sex <- factor(cens$sex,labels=c("Male","Female"))
+  
+  cens$age[cens$age==999] <- NA
+  cens$ageEU <- cut(cens$age,c(15,24,34, 44, 54, 64))
+  cens$sample <- factor(cens$sample)
+  levels(cens$sample) <- c("FR","GR","IT","NL","PT","ES","UK")
+@ 
+
+\section{Introduction}
+\label{sec:introduction}
+
+The chief quantity of interest in this paper is the effect of the 1994 change in question order on respondents' satisfaction with EU-level democracy. Moreoever, the fact that the ``new'' order elicits a comparison between domestic and EU institutions reveals something about the sources of EU legitimacy through the interaction with national institutions.
+
+\section{Complete-Pooling Model}
+\label{sec:compl-pool-model}
+
+The first model considers the entire pooled dataset and estimates EU satisfaction as a function of perceiving benefits from EU membership, satisfaction with national institutions, national regime support, question order effect, and the interaction of national institution satisfaction and the order effect. The outcome is a dichotomized satisfied / dissatisfied and we model the latent satisfaction using a Normal CDF, or probit, link function\footnote{Later on, we consider the other response categories and model all four categories in an ordered probit setup.}. The results in Table \ref{tab:model1} (presented graphically in Figure \ref{fig:model1}
+) are encouraging in broad strokes. All of the predictor variables are statistically significant in the expected direction. Satisfaction with national democracy is the strongest predictor of satisfaction with EU democracy; the belief that one's country has benefited from EU membership is also a strong predictor of satisfaction with EU institutions. On average, framing EU democracy in the light of national institutions results in a lower probability of being satisfied with EU democracy. However, this effect is mitigated, even overcome, for respondents who supported the national government in the last election. This result supports the proposition that EU institutions derive some legitimacy through the delegation of powers from national governments.
+
+<<complete-pooling-model>>=
+model1 <- glm(E~ben+N+regimeSupport1+change*N,
+              data=data.common, model=T, family=binomial("probit"))
+@ 
+\begin{table}[htb]\centering
+\caption{Pooling across all countries assumes a common effect of all predictors.}
+<<complete-pooling-table,results=tex,echo=FALSE>>=
+apsrtable(model1,Sweave=TRUE,Minionfig=TRUE)
+@ 
+\label{tab:model1}
+\end{table}
+\begin{figure}[htb]
+  \centering
+  \caption{Graphical summary of Model 1}
+  \label{fig:model1}
+
+\setkeys{Gin}{width=4in,height=2.5in}
+<<complete-pooling-figure,fig=TRUE,echo=FALSE,width=8,height=5>>=
+coefplot(model1,
+         varnames=c("Intercept","EU Benefit",
+           "Nat. Sat.",
+           "Nat. Regime Support",
+           "Q. Order",
+           "Nat. Sat * Q. Order"), 
+         mar=c(2,4,5,3)
+         )
+
+@ 
+\end{figure}
+\clearpage
+\section{Independent Models (No Pooling)}
+\label{sec:indep-models-no}
+<<no-pool-models>>=
+
+countrymodels <- by(data.common, data.common$country, function(x) {
+  glm(E~ben+N+regimeSupport1+change*N,
+      data=x, family=binomial("probit")) 
+} )
+
+@ 
+\begin{footnotesize}
+%% This is not included because we need a widetable, results just copied into here is easier.
+<<no-pool-table,results=hide,echo=FALSE,include=FALSE>>= 
+
+  apsrtable(countrymodels[[ 1 ]],countrymodels[[ 2 ]],countrymodels[[ 3 ]],countrymodels[[ 4 ]],countrymodels[[ 5 ]],countrymodels[[ 6 ]],countrymodels[[ 7 ]],countrymodels[[ 8 ]],countrymodels[[ 9 ]],countrymodels[[ 10 ]],countrymodels[[ 11 ]],countrymodels[[ 12 ]],
+          model.names=names(countrymodels), Sweave=TRUE, Minionfig=TRUE)
+
+@
+\figureversion{tabular}
+\begin{sidewaystable}
+\begin{tabular}{lD{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}D{.}{.}{2}}\hline
+ & \multicolumn{1}{l}{FR} & \multicolumn{1}{l}{BE} & \multicolumn{1}{l}{NL} & \multicolumn{1}{l}{DE-W} & \multicolumn{1}{l}{IT} & \multicolumn{1}{l}{LU} & \multicolumn{1}{l}{DK} & \multicolumn{1}{l}{IE} & \multicolumn{1}{l}{UK} & \multicolumn{1}{l}{GR} & \multicolumn{1}{l}{ES} & \multicolumn{1}{l}{PT}\\ 
+%                  & FRANCE         & BELGIUM        & NETHERLANDS    & WEST GERMANY   & ITALY          & LUXEMBOURG     & DENMARK        & IRELAND        & UNITED KINGDOM & GREECE         & SPAIN          & PORTUGAL      \\ 
+(Intercept)        & -0.87 *        & -0.66 *        & -1.00 *        & -0.99 *        & -0.72 *        & -0.68 *        & -1.37 *        & -0.31 *        & -0.48 *        & -1.07 *        & -0.72 *        & -0.60 *       \\ 
+                   & (0.11)         & (0.12)         & (0.13)         & (0.10)         & (0.11)         & (0.23)         & (0.14)         & (0.15)         & (0.08)         & (0.11)         & (0.08)         & (0.12)        \\ 
+benTRUE            & 0.54 *         & 0.56 *         & 0.45 *         & 0.60 *         & 0.43 *         & 0.41 *         & 1.07 *         & 0.88 *         & 0.84 *         & 0.75 *         & 0.48 *         & 0.65 *        \\ 
+                   & (0.08)         & (0.09)         & (0.10)         & (0.07)         & (0.08)         & (0.15)         & (0.08)         & (0.13)         & (0.07)         & (0.10)         & (0.08)         & (0.09)        \\ 
+NTRUE              & 0.93 *         & 0.78 *         & 0.83 *         & 0.92 *         & 0.53 *         & 0.88 *         & 0.78 *         & 0.55 *         & 0.44 *         & 0.51 *         & 1.20 *         & 0.64 *        \\ 
+                   & (0.13)         & (0.12)         & (0.12)         & (0.11)         & (0.15)         & (0.22)         & (0.13)         & (0.13)         & (0.10)         & (0.12)         & (0.14)         & (0.13)        \\ 
+regimeSupport1TRUE & 0.10           & 0.09           & 0.02           & -0.03          & 0.00           & 0.21           & -0.07          & -0.10          & -0.36 *        & -0.19 *        & 0.07           & 0.13          \\ 
+                   & (0.09)         & (0.09)         & (0.07)         & (0.08)         & (0.08)         & (0.12)         & (0.07)         & (0.09)         & (0.08)         & (0.08)         & (0.09)         & (0.09)        \\ 
+change             & -0.28 *        & -0.65 *        & -0.54 *        & -0.36 *        & 0.16           & -0.84 *        & -0.37          & -0.59 *        & -0.20 *        & 0.25 *         & -0.14          & -0.64 *       \\ 
+                   & (0.13)         & (0.13)         & (0.15)         & (0.13)         & (0.09)         & (0.29)         & (0.19)         & (0.13)         & (0.09)         & (0.09)         & (0.10)         & (0.12)        \\ 
+NTRUE:change       & 0.58 *         & 1.09 *         & 0.49 *         & 0.54 *         & 0.48 *         & 1.01 *         & 0.22           & 0.76 *         & 0.25           & 0.36 *         & 0.33           & 1.17 *        \\ 
+                   & (0.17)         & (0.17)         & (0.17)         & (0.16)         & (0.18)         & (0.32)         & (0.20)         & (0.17)         & (0.13)         & (0.16)         & (0.18)         & (0.17)        \\ 
+$N$                & 1213           & 1174           & 1417           & 1451           & 1231           & 643            & 1523           & 1347           & 1606           & 1317           & 1228           & 1288          \\ 
+AIC                & 1315.69        & 1184.11        & 1743.19        & 1606.97        & 1552.80        & 667.79         & 1786.24        & 1249.97        & 1956.99        & 1633.34        & 1323.98        & 1269.61       \\ 
+BIC                & 1438.12        & 1305.75        & 1869.35        & 1733.69        & 1675.58        & 774.98         & 1914.12        & 1374.90        & 2086.14        & 1757.74        & 1446.70        & 1393.47       \\ 
+$\log L$          & -633.85        & -568.06        & -847.60        & -779.49        & -752.40        & -309.89        & -869.12        & -600.98        & -954.49        & -792.67        & -637.99        & -610.80       \\\hline
+\multicolumn{13}{l}{Standard errors in parentheses}\\
+\end{tabular}
+
+\end{sidewaystable}
+\figureversion{tabular}
+
+\end{footnotesize}
+\clearpage
+\section{Country Fixed Effects}
+\label{sec:country-fixed-effect}
+
+Next, country fixed effects are included -- that is, an indicator for each country that represents the baseline satisfaction with EU democracy in that country. This model is estimated without an intercept, so that all country baselines are included. 
+
+<<country-fixed-model>>=
+
+model.fixed <- glm(E~0+country+ben+N+regimeSupport1+change*N,
+              data=data.common, model=T, family=binomial("probit"))
+
+@ 
+\begin{table}[htb]
+  \centering
+  \caption{Model with country fixed effects.}
+<<country-fixed-table,results=tex,echo=FALSE>>=
+apsrtable(model.fixed, Sweave=TRUE, model.counter=3)
+
+@ 
+\end{table}
+\section{Country Intercepts}
+\label{sec:country-intercepts}
+
+Now, we relax the assumption of the previous model that there is no common baseline, and allow the intercept to vary by country. 
+<<country-intercepts-model,eval=FALSE>>=
+
+country.int <- lmer(E~ben+N+regimeSupport1+change*N + (1|country),
+                    data=data.common, family=binomial("probit"))
+country.samp <- mcsamp(country.int,
+                       n.iter=5000,n.burnin=500)        
+
+@ 
+\setkeys{Gin}{width=7in,height=5in}
+\begin{figure}[htb]\centering
+  \caption{Pooled model with country intercepts.}
+  \label{fig:intercept-figure}
+  
+<<intercept-figure,fig=TRUE,echo=FALSE,width=7,height=5,eval=FALSE>>=
+coefplot(country.samp,
+         mar=c(2,4,5,3),
+         varnames=c("Intercept","EU Benefit","Nat Satis", "Nat Regime Support", "Change", "Change * Nat Sat", "sigma.country", levels(data.common$country)) )
+
+@ 
+\end{figure}
+\section{Country Intercepts and Order Effects}
+\label{sec:country-interc-order}
+Finally, the most complex model estimates a varying intercept for each country and also allows the effect of the change to vary by country. All other effects are assumed to be common. This model is fit here in quick-and-dirty penalized likelihood using \texttt{lmer()} but is the starting point for the (correct) Bayesian hierarchical model.
+
+<<vary-both-model,eval=FALSE>>=
+
+model.varchange <- lmer(E~ben+N+regimeSupport1+change*N + (1+change|country),
+                    data=data.common, family=binomial("probit"))
+varchange.samp <-sim(model.varchange, n.sims=5000)
+@ 
+\begin{figure}[htb]
+  \centering
+  \caption{Summary of varying-slope varying-intercept model.}
+  \label{fig:varchange}
+\setkeys{Gin}{width=7in,height=8in}
+<<varchange-figure,fig=TRUE,echo=FALSE,width=7,height=8,eval=FALSE>>=
+coefplot(varchange.samp,
+         mar=c(2,6,5,3),
+         varnames=c("Intercept","EU Benefit","Nat Satis", "Nat Regime Support", "Change", "Change * Nat Sat", "sigma.country","sigma.change","rho.random eff",levels(data.common$country), paste("change in",levels(data.common$country)) ) )
+@ 
+\end{figure}
+
+\section{Monism/Dualism: How the EU is portrayed and perceived}
+\label{sec:monismd-how-eu}
+<<monistdualist-model>>=
+monist <- data.frame(country=levels(data.common$country))
+monist$monist <- 1; monist$monist[c(4,5,7,8,9)] <- 0
+monist$rohrinstqual <- c(17.43,16.95,18,17.03,13.5,18,18,16.15,16.75,13.65,14.16,14.08)
+instqual <- data.frame(matrix(unlist(by(data.common[,c("regimeSupport1","N")],data.common$country,function(x) {
+  x <- na.omit(x)
+  n <- nrow(x)
+  badinst <- sum(x[,1]==TRUE & x[,2]==FALSE) /n
+  goodinst <- sum(x[,1]==FALSE & x[,2]==TRUE)/n
+   
+  c ( badinst,goodinst, goodinst/badinst ) } )
+         ),nrow=12,ncol=3,byrow=TRUE))
+names(instqual) <- c("RegimeNotNInst","NInstDespite","instQual")
+instqual$country <- levels(data.common$country)
+monist <- merge(monist,instqual)
+data.common <- merge(data.common,monist)
+
+
+model.varchange <- glmer(formula=E~ben+N+regimeSupport1+instQual+ monist+ (1+change|country) + (1|occ1) + (1|sex) + (1|age) ,
+                    data=data.common ,family=binomial("logit")
+                        )
+
+
+@ 
+\section{Quality and Satisfaction with National Institutions}
+\label{sec:qual-satisf-with}
+
+<<qual-inst>>=
+instqual <- data.frame(matrix(unlist(by(data.common[,c("regimeSupport1","N")],data.common$country,function(x) {
+  x <- na.omit(x)
+  n <- nrow(x)
+  badinst <- sum(x[,1]==TRUE & x[,2]==FALSE) /n
+  goodinst <- sum(x[,1]==FALSE & x[,2]==TRUE)/n
+   
+  c ( badinst,goodinst, goodinst/badinst ) } )
+         ),nrow=12,ncol=3,byrow=TRUE))
+names(instqual) <- c("RegimeNotNInst","NInstDespite","instQual")
+rownames(instqual) <- levels(data.common$country)
+
+
+@ 
+\end{document}
