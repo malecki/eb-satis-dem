@@ -1,6 +1,6 @@
 ## Change this to point to your local working copy 
 ## of the repository (eg just "~/apsa07")
-setwd("~/matt/apsa07")
+setwd("~/eb")
 library(lattice)   # used for graphics. some params set up in readData.R
 library(survey)    # used for surveydesign,pweights
 library(xtable)    # some output to latex
@@ -366,11 +366,6 @@ apsrtable(models=lapply(
               (glm(E~N+country*regimeSupport1,data=x,model=T,family=binomial("probit")))})
           ,digits=2, star=.05, z=FALSE, align="left") 
 
-
-z <- outer(x,y, function(x,y) {
-  2*pi*x*y*
-    (1/(sqrt(1-cor(x,y)^2))*
-     exp(
 ## create pooled time series with change variable
 
 ######## dataListToPooledDF()
