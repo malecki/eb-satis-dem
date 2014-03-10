@@ -1,0 +1,17 @@
+Package: ebSatisfactionWithDemocracy
+Type: Package
+Title: Data and code supporting a survey analysis on satisfaction with
+    democracy in the EU
+Version: 0.5
+Date: 2014-03-10
+Author: Michael Malecki
+Maintainer: Malecki <malecki@gmail.com>
+Description: Data and code supporting a survey analysis on satisfaction with
+    democracy in the EU
+License: MIT
+Depends:
+    ggplot2,
+    lattice,
+    survey,
+    reshape2,
+    arm
