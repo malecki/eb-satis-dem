@@ -483,7 +483,7 @@ swd.411 <- within(swd.411, {
   age <- gsub("\\sYEARS","",age)
   age <- gsub("\\sAND OLDER","+",age)
   age <- factor(age, ordered=TRUE)
-  occ <- ifelse(occ1
+  #occ <- ifelse(occ1
 })
   rm(eb411)
   if (do.all==TRUE) {

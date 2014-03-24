@@ -102,10 +102,12 @@ print(p.byNatSat);graphics.off()
 ############ DETAILED E by N SUPPORT
 
 ##### N by support
-byNatSat <- listToDotplotDF(meanE.na.detailed,change=4,
+byNatSat <- listToDotplotDF(meanE.na.detailed,change=2,
                             names=c("country","byVar","Diff","change"),
                             byLabels=c("Nat. Very Sat.","Nat. Fairly Sat.","Nat. Not Very Sat.","Nat. Not at all"))
-byNatSat$country <-  rep(data.frame(ftable(meanN.na.byCountryAndSupport[[6]]))$Var1) ## REALLY UGLY HACK FOR LOWER CASE COUNTRY NAMES!!!
+levels(byNatSat$country) <- gsub("\\b([a-z])([a-z]+)", "\\U\\1\\L\\2" ,
+                                 tolower(levels(byNatSat$country)), 
+                                 perl=TRUE)
 
 trellis.device(file="poster/EbyNdetailed.pdf",
                device="pdf",color=T,width=8.5,height=5)

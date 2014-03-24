@@ -92,13 +92,11 @@ meanE.0.detailed <- lapply(data.0,  function(x) {
 ## Now compute the proportion satisfied, by country
 ## taking into account survey prop weight
 meanN.na.s <- lapply(data.na.s, function(x) {
-  svyby(x$variables$N,x$variables$country,design=x,svymean,na.rm=T)
-}
-                   )
+  svyby(~N,~country,design=x,svymean,na.rm=T)
+})
 meanE.na.s <- lapply(data.na.s, function(x) {
-  svyby(x$variables$E,x$variables$country,design=x,svymean,na.rm=T)
-}
-                   )
+  svyby(~E,~country,design=x,svymean,na.rm=T)
+})
 meanN.0.s <- lapply(data.0.s, function(x) {
   svyby(x$variables$N,x$variables$country,design=x,svymean,na.rm=T)
 }
@@ -111,7 +109,7 @@ meanE.0.s <- lapply(data.0.s, function(x) {
 ## function with no arguments compares hard coded named
 ## lists of EU and National mean proportions satisfied
 weightDifferences <- function() {
-diffs <- list()
+diffs <- list("E","N")
 for (i in 1:length(meanE.na)){
  	diffs[["E"]][[i]] <- (meanE.na[[i]][1:12] - meanE.na.s[[i]]$statistics[1:12])
 	diffs[["N"]][[i]] <- (meanN.na[[i]][1:12] - meanN.na.s[[i]]$statistics[1:12])
@@ -205,14 +203,12 @@ lapply(meanE.na,  function(x) {xtable(rbind(x[1:2])) })
 ## taking into account survey prop weight
 
 meanE.na.s <- lapply(data.na.s, function(x) {
-  svyby(x$variables$E,x$variables$N,design=x,svymean,na.rm=T)
-}
-                   )
+  svyby(~E,~N,design=x,svymean,na.rm=T)
+})
 
 meanE.0.s <- lapply(data.0.s, function(x) {
-  svyby(x$variables$E,list(x$variables$country,x$variables$N),design=x,svymean,na.rm=T)
-}
-                  )
+  svyby(~E,list(x$variables$country,x$variables$N),design=x,svymean,na.rm=T)
+})
 
 
 
